@@ -1,0 +1,31 @@
+create table Borrower(roll_no int,name varchar(20),Dateofissue date,NameofBook varchar(20),Status varchar(20));
+insert into Borrower values(1,"John","2022-10-04","DBMS","I");
+insert into Borrower values(2,"Dravid","2022-11-04","CNS","I");
+insert into Borrower values(3,"David","2022-11-11","OOP","I");
+insert into Borrower values(4,"Kevin","2022-09-11","SPOS","I");
+insert into Borrower values(4,"","2022-08-11","SPM","I");
+
+create table fine(roll_no int,CDate Date,amt int);
+
+delimiter //
+
+create procedure return_book(in roll_no int,in book varchar(20))
+begin
+declare days int;
+declare exit handler for NOT FOUND
+begin
+select "Book Not Found " as Exception;
+end;
+select DATEDIFF(Current_date,DateOfIssue) into days from borrower where roll_no=roll_no and NameOfBook=book;
+if days>15 and days<30 then
+insert into fine values(roll_no,CURRENT_DATE,days*5);
+elseif days>30 then
+insert into fine values(roll_no,CURRENT_DATE,(days-30)*50+150);
+else
+select "No Fine Required to Pay" as message;
+end if;
+Update Borrower set Status="R" where roll_no=roll_no and NameofBook=book;
+end; //
+
+delimiter ;
+call return_book(1,"DBMS");
